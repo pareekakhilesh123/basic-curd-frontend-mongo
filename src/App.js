@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const api = 'http://localhost:5000/users';
 
 function App() {
+  const [users, setUsers] = useState([]);
+
+
+  const fetchUsers = async () => {
+    const res = await axios.get(api);
+    setUsers(res.data);
+  };
+
+ 
+
+  const handleDelete = async (id) => {
+    await axios.delete(`${api}/${id}`);
+    fetchUsers();
+  };
+
+  useEffect(() => { fetchUsers(); }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 20 }}>
+      <h2>MongoDB CRUD App</h2>
+ 
+
+      <ul>
+        {users.map(u => (
+          <li key={u._id}>
+            {u.name} - {u.email} - {u._id}  {u.password}  {u.zipcode}
+            <button >Edit</button>
+            <button onClick={() => handleDelete(u._id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
