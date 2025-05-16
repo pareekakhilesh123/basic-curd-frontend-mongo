@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+require('dotenv').config(); 
 
-const api = 'http://localhost:5000/users';
+const api = process.env.BACKEND_API ;s
 
 function App() {
   const [users, setUsers] = useState([]);
