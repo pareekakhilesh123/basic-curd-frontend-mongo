@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 require('dotenv').config(); 
 
-const api = process.env.BACKEND_API ;s
+const api = process.env.BACKEND_API  ;
 
 function App() {
   const [users, setUsers] = useState([]);
