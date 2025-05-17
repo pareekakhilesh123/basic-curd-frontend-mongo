@@ -8,8 +8,13 @@ function App() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    phone: '',
+    zipcode: ''
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -35,13 +40,20 @@ function App() {
 
   const submitData = async () => {
     try {
-      await axios.post(api, formData);
-      console.log("User added successfully");
+      if (isEditing) {
+        await axios.put(`${api}/${editId}`, formData);
+        console.log("User updated successfully");
+      } else {
+        await axios.post(api, formData);
+        console.log("User added successfully");
+      }
+
       setFormData({ name: '', email: '', password: '', phone: '', zipcode: '' });
-      // Reset form data after submission   
+      setIsEditing(false);
+      setEditId(null);
       fetchUsers();
     } catch (error) {
-      console.error("Error adding user:", error);
+      console.error("Error saving user:", error);
     }
   };
 
@@ -49,11 +61,12 @@ function App() {
     try {
       const res = await axios.get(`${api}/${id}`);
       setFormData(res.data);
+      setIsEditing(true);
+      setEditId(id);
     } catch (err) {
       console.error("Failed to fetch user for edit:", err);
     }
-  }
- 
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -70,57 +83,66 @@ function App() {
         <table style={{ border: '1px solid black', width: '100%' }}>
           <tbody>
             <tr>
-              <td style={{ border: '1px solid black' }}>   <label>User Name:</label>
-        <input
-          type="text"
-          placeholder="Enter name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-        /></td>
               <td style={{ border: '1px solid black' }}>
-        <label>User Email:</label>
-        <input
-          type="text"
-          placeholder="Enter the Email id"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        /></td>
-              <td style={{ border: '1px solid black' }}>  <label>User phone:</label>
-        <input
-          type="text"
-          placeholder="Enter the phone"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-        /></td>
-                </tr>
+                <label>User Name:</label>
+                <input
+                  type="text"
+                  placeholder="Enter name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </td>
+              <td style={{ border: '1px solid black' }}>
+                <label>User Email:</label>
+                <input
+                  type="text"
+                  placeholder="Enter the Email id"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </td>
+              <td style={{ border: '1px solid black' }}>
+                <label>User phone:</label>
+                <input
+                  type="text"
+                  placeholder="Enter the phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+              </td>
+            </tr>
             <tr>
-              <td style={{ border: '1px solid black' }}>  <label>User Password:</label>
-        <input
-          type="password"
-          placeholder="Enter the Password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        /></td>
               <td style={{ border: '1px solid black' }}>
-        <label>User ZipCode:</label>
-        <input
-          type="text"
-          placeholder="Enter the ZipCode"
-          name="zipcode"
-          value={formData.zipcode}
-          onChange={handleChange}
-        /></td>
-            
-        <button type="button" onClick={submitData}>Add User</button>
-    </tr>
+                <label>User Password:</label>
+                <input
+                  type="password"
+                  placeholder="Enter the Password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </td>
+              <td style={{ border: '1px solid black' }}>
+                <label>User ZipCode:</label>
+                <input
+                  type="text"
+                  placeholder="Enter the ZipCode"
+                  name="zipcode"
+                  value={formData.zipcode}
+                  onChange={handleChange}
+                />
+              </td>
+              <td>
+                <button type="button" onClick={submitData}>
+                  {isEditing ? "Update User" : "Add User"}
+                </button>
+              </td>
+            </tr>
           </tbody>
-     </table>
-        
-
+        </table>
       </div>
 
       <h3 style={{ marginTop: 40 }}>Users List</h3>
@@ -142,7 +164,7 @@ function App() {
               </tr>
             </tbody>
           </table>
-          <button onClick={() => handleEdit(u.id)}>Edit</button>
+          <button onClick={() => handleEdit(u._id)}>Edit</button>
           <button onClick={() => handleDelete(u._id)}>Delete</button>
         </div>
       ))}
